@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     char cmd[PAT_SIZE];                // Buffer for command input
     FILE *fp;                          // File stream returned by my_popen()
     int status;
-
+    memset(popen_table, 0, sizeof(popen_table)); // initialize the table
     while (1) {                        // Loop to accept commands
         printf("myshell -> ");         // Prompt for command input
         fflush(stdout);

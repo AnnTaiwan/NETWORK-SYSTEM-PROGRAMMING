@@ -1,8 +1,6 @@
 #include "popen_pclose.h"
-#ifndef BUF_SIZE 
-#define BUF_SIZE 1024
-#endif
-static popen_entry popen_table[BUF_SIZE];
+
+
 
 void errExit(const char *msg)
 {
