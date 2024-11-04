@@ -4,9 +4,9 @@
 2. exercise44_1.c turn input string text into uppercase string.  
     `$ ./exercise44_1`   
 3. Implement `popen` and `pclose` in popen_pclose.c  
-exercise44_2.c implement a simple shell, and it can execute the command that user inputs.  
+exercise44_2.c implement a simple shell, and it can **execute the command that user inputs.**  
 Inside, it will call `my_popen` and `my_pclose`.  
-    `$ ./exercise44_1`  
+    `$ ./exercise44_2`  
     myshell -> ls -al  
     total 108  
     drwxrwxr-x  2 ann ann  4096 十一  4 20:51 .  
