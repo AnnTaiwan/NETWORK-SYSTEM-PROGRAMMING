@@ -38,7 +38,16 @@ int main(int argc, char *argv[])
     char *buffer_signal = mmap(0, MAX_NUMBER_LEN, PROT_WRITE, MAP_SHARED, shm_signal_fd, 0);
     if(buffer_signal == MAP_FAILED)
         errExit("mmap");
-        
+    
+    /*// open loss data shm
+    int shm_loss_fd = shm_open(SHM_LOSS_NAME, O_RDWR, 0666);
+    if(shm_loss_fd == -1)  
+        errExit("shm_open");
+    SharedData *buffer_loss = mmap(0, sizeof(SharedData), PROT_READ, MAP_SHARED, shm_loss_fd, 0); // read it
+    if(buffer_loss == MAP_FAILED)
+        errExit("mmap");
+      */  
+    
     // create mask to catch the signal that main program sends to inform finsh of creation of consumers
     sigset_t blockedMask, emptyMask;
     sigemptyset(&blockedMask);
@@ -51,8 +60,10 @@ int main(int argc, char *argv[])
     if (sigsuspend(&emptyMask) == -1 && errno != EINTR)
         errExit("sigsuspend");
     printf("[Producer] catches the signal of completion of creating consumer processes.\n");
+    
+    
     int i = 0;
-    for (i = 0; i < M; i++) {
+    for (i = 0; i < M; i++) { // start to send msgs and signals
         usleep(R * 1000);  // usleep accept micro second, so it need to * 1000
         
         // produce msg
@@ -60,12 +71,11 @@ int main(int argc, char *argv[])
         printf("[Producer] send '%s'\n", buffer[i % B]);
 
         // send signal to consumer
-        printf("[Producer] Sending signal to process group %d\n", -group_pid);
-        //union sigval value;
-        //value.sival_int = i; // carry msg idx
-        /*if (sigqueue(-group_pid, SIGUSR1, value) == -1) { // send to the process group by specifing negative pgid
-            errExit("Failed to send signal");
-        }*/
+        //printf("[Producer] Sending signal to process group %d\n", -group_pid);
+        
+        /*  use shared memory to send the msg index because sigqueue can only send signal to process one by one.
+            I want to use killpg to send signal to all processes in this group which is forked from the program process
+        */
         snprintf(buffer_signal, MAX_NUMBER_LEN - 1, "%d", i);
         if (killpg(group_pid, SIGUSR1) == -1) {
             perror("[Producer] Failed to send signal using killpg");
@@ -77,15 +87,14 @@ int main(int argc, char *argv[])
         
     // produce msg
     snprintf(buffer[i % B], 80 - 1, "%s%d", HEAD_MSG, -1);
-    printf("[Producer] send '%s'\n", buffer[i % B]);
+    printf("[Producer] send last msg '%s'\n", buffer[i % B]);
 
     // send signal to consumer
-    printf("[Producer] Sending signal to process group %d\n", -group_pid);
-    snprintf(buffer_signal, MAX_NUMBER_LEN - 1, "%d", -1);
+    snprintf(buffer_signal, MAX_NUMBER_LEN - 1, "%d", 0);
     if (killpg(group_pid, SIGUSR1) == -1) {
         perror("[Producer] Failed to send signal using killpg");
     }
-    printf("[Producer] send signal to %d\n", group_pid);
+    printf("[Producer] send last signal to %d\n", group_pid);
     
     
     
@@ -95,6 +104,11 @@ int main(int argc, char *argv[])
     close(shm_signal_fd); // File descriptor is no longer needed after mmap
     if (munmap(buffer_signal, MAX_NUMBER_LEN) == -1)
         errExit("munmap");
+        
+    /*close(shm_loss_fd); // File descriptor is no longer needed after mmap
+    if (munmap(buffer_loss, sizeof(SharedData)) == -1)
+        errExit("munmap");
+       */ 
     printf("[Producer] finshes sending the signal to consumer group.\n");
     exit(EXIT_SUCCESS);
 }
