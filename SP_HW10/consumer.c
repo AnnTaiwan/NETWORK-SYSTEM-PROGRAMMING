@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         msg_num = atoi(msg + head_len);
         if(msg_num == -1) // received final msg early
         {
-            printf("[Consumer%d] receive '-1' msg early.\n", consumer_id);
+            printf("[Consumer%d] At idx %d, receive '-1' msg early.\n", consumer_id, i);
             break;
         }
         else 
@@ -111,8 +111,7 @@ int main(int argc, char *argv[])
         //printf("[Consumer%d] msg_num = %d, received_signal_seq = %d\n", consumer_id, msg_num, received_signal_seq);
         
     }
-    //float loss_rate = 1 - (float)count / (float)M;
-   // printf("[Consumer%d] loss rate = %f\n", consumer_id, loss_rate);
+    
     close(shm_fd); // File descriptor is no longer needed after mmap
     if (munmap(buffer, B * 80) == -1)
         errExit("munmap");
