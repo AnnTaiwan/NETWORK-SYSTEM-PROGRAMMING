@@ -33,4 +33,3 @@ clean:
 	rm -f $(EXES1) $(OBJS1) $(EXES2) $(OBJS2)
 
 .PHONY: all clean
-
