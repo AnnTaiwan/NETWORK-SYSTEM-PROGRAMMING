@@ -38,12 +38,14 @@ int lookup(Dictrec * sought, const char * resource) {
 	/* Send a datagram & await reply
 	 * Fill in code. */
 	int server_size = sizeof(struct sockaddr_in);
-    int n = sendto(sockfd, sought -> word, sizeof(sought -> word), 0, (const struct sockaddr *)&server, server_size); // request info about this word to server
+	// request info about this word to server
+    int n = sendto(sockfd, sought -> word, sizeof(sought -> word), 0, (const struct sockaddr *)&server, server_size); 
     if (n < 0) {
-        DIE("sendto error");
+        DIE("sendto");
     }
     memset(sought -> text, '\0', sizeof(sought -> text)); // clear it
     n = recvfrom(sockfd, sought -> text, sizeof(sought -> text), 0, NULL, NULL); // get the reply
+    sought -> text[n] = '\0';
     if (n < 0) {
         DIE("recvfrom error");
     }

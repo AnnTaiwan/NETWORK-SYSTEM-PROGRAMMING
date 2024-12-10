@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     if (sockfd < 0)
         DIE("Socket creation failed");
     int opt = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) // let this socket be reused
         DIE("setsockopt failed");
 	/* Initialize address.
 	 * Fill in code. */

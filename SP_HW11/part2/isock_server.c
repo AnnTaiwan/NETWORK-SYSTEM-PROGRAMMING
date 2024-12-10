@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
          DIE("socket");
     int opt = 1;
-    if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0)
+    if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
         DIE("setsockopt failed");
 	/* Initialize address.
 	 * Fill in code. */
